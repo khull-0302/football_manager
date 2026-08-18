@@ -11,3 +11,11 @@ def add_stadium():
 @stadium.route("/stadiums", methods=["GET"])
 def get_all_stadiums():
     return controllers.get_all_stadiums()
+
+@stadium.route('/stadium/<stadium_id>', methods=['PUT'])
+def update_stadium_by_id(stadium_id):
+    return controllers.update_stadium_by_id(stadium_id)
+
+@stadium.route("/stadium/delete/<stadium_id>", methods=["DELETE"])
+def delete_stadium_by_id(stadium_id):
+    return controllers.delete_stadium_by_id(stadium_id)

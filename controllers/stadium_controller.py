@@ -42,3 +42,44 @@ def get_all_stadiums():
     stadiums_query = db.session.query(Stadiums).all()
     
     return jsonify({"message": "stadiums found", "results": stadiums_schema.dump(stadiums_query)}), 200
+
+
+
+@authenticate_return_auth
+def update_stadium_by_id(stadium_id, auth_info):
+    if auth_info.user.role != 'super-admin':
+                    return jsonify({"message": "unauthorized"}), 401
+    post_data = request.form if request.form else request.json
+
+    stadium_query = db.session.query(Stadiums).filter(Stadiums.stadium_id == stadium_id).first()
+
+    if stadium_query:
+        populate_object(stadium_query, post_data)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return jsonify({"message": "unable to update stadium"}), 400
+        
+        return jsonify({"message": "stadium updated", "result": stadium_schema.dump(stadium_query)}), 200
+    
+    return jsonify({"message": "unable to update stadium"}), 400
+
+
+@authenticate_return_auth
+def delete_stadium_by_id(stadium_id, auth_info):
+    if auth_info.user.role != 'super-admin': 
+            return jsonify({"message": "unauthorized"}), 401
+    
+    stadium_query = db.session.query(Stadiums).filter(Stadiums.stadium_id == stadium_id).first()
+
+    if not stadium_query:
+        return jsonify({"message": "stadium not found"}), 404
+
+    db.session.delete(stadium_query)
+    db.session.commit()
+
+    return jsonify({
+        "message": "stadium deleted"
+    }), 200

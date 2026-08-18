@@ -75,6 +75,20 @@ def get_my_players(auth_info):
         "results": players_schema.dump(players_query)
     }), 200
 
+@authenticate
+def get_players_by_name(first_name):
+    players_query = db.session.query(Players).filter(
+        Players.first_name.ilike(f"{first_name}%")
+    ).all()
+
+    if not players_query:
+         return jsonify({"message": "no players found"})
+
+    return jsonify({
+        "message": "players found",
+        "results": players_schema.dump(players_query)
+    }), 200
+
 
 @authenticate_return_auth
 def update_player_by_id(player_id, auth_info):
@@ -97,4 +111,22 @@ def update_player_by_id(player_id, auth_info):
         return jsonify({"message": "player updated", "result": player_schema.dump(player_query)}), 200
     
     return jsonify({"message": "unable to update player"}), 400
+
+
+@authenticate_return_auth
+def delete_player_by_id(player_id, auth_info):
+    if auth_info.user.role != 'super-admin': 
+            return jsonify({"message": "unauthorized"}), 401
+    
+    player_query = db.session.query(Players).filter(Players.player_id == player_id).first()
+
+    if not player_query:
+        return jsonify({"message": "player not found"}), 404
+
+    db.session.delete(player_query)
+    db.session.commit()
+
+    return jsonify({
+        "message": "player deleted"
+    }), 200
 

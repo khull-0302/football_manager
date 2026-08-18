@@ -28,3 +28,10 @@ def get_my_players():
 def update_player_by_id(player_id):
     return controllers.update_player_by_id(player_id)
 
+@player.route("/player/delete/<player_id>", methods=["DELETE"])
+def delete_player_by_id(player_id):
+    return controllers.delete_player_by_id(player_id)
+
+@player.route('/players/name/<first_name>', methods=['GET'])
+def get_players_by_name(first_name):
+    return controllers.get_players_by_name(first_name)

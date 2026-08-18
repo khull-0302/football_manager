@@ -33,3 +33,44 @@ def get_all_teams():
     teams_query = db.session.query(Teams).all()
 
     return jsonify({"message": "teams found", "results": teams_schema.dump(teams_query)}), 200
+
+
+@authenticate_return_auth
+def update_team_by_id(team_id, auth_info):
+    if auth_info.user.role != 'super-admin':
+                    return jsonify({"message": "unauthorized"}), 401
+    
+    post_data = request.form if request.form else request.json
+
+    team_query = db.session.query(Teams).filter(Teams.team_id == team_id).first()
+
+    if team_query:
+        populate_object(team_query, post_data)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return jsonify({"message": "unable to update team"}), 400
+        
+        return jsonify({"message": "team updated", "result": team_schema.dump(team_query)}), 200
+    
+    return jsonify({"message": "unable to update team"}), 400
+
+
+@authenticate_return_auth
+def delete_team_by_id(team_id, auth_info):
+    if auth_info.user.role != 'super-admin': 
+            return jsonify({"message": "unauthorized"}), 401
+    
+    team_query = db.session.query(Teams).filter(Teams.team_id == team_id).first()
+
+    if not team_query:
+        return jsonify({"message": "team not found"}), 404
+
+    db.session.delete(team_query)
+    db.session.commit()
+
+    return jsonify({
+        "message": "team deleted"
+    }), 200

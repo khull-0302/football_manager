@@ -42,3 +42,44 @@ def get_all_coaches():
     coaches_query = db.session.query(Coaches).all()
     
     return jsonify({"message": "coaches found", "results": coaches_schema.dump(coaches_query)}), 200
+
+
+@authenticate_return_auth
+def update_coach_by_id(coach_id, auth_info):
+    if auth_info.user.role != 'super-admin':
+                return jsonify({"message": "unauthorized"}), 401
+    
+    post_data = request.form if request.form else request.json
+
+    coach_query = db.session.query(Coaches).filter(Coaches.coach_id == coach_id).first()
+
+    if coach_query:
+        populate_object(coach_query, post_data)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return jsonify({"message": "unable to update coach"}), 400
+        
+        return jsonify({"message": "coach updated", "result": coach_schema.dump(coach_query)}), 200
+    
+    return jsonify({"message": "unable to update coach"}), 400
+
+
+@authenticate_return_auth
+def delete_coach_by_id(coach_id, auth_info):
+    if auth_info.user.role != 'super-admin': 
+            return jsonify({"message": "unauthorized"}), 401
+    
+    coach_query = db.session.query(Coaches).filter(Coaches.coach_id == coach_id).first()
+
+    if not coach_query:
+        return jsonify({"message": "coach not found"}), 404
+
+    db.session.delete(coach_query)
+    db.session.commit()
+
+    return jsonify({
+        "message": "coach deleted"
+    }), 200

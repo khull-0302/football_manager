@@ -16,7 +16,7 @@ class Users(db.Model):
     active = db.Column(db.Boolean(), default=True)
 
     
-    auth = db.relationship("AuthTokens", back_populates="user")
+    auth = db.relationship("AuthTokens", back_populates="user", cascade="all, delete-orphan")
     players = db.relationship( "Players", secondary=users_players_fav_table, back_populates="users" )
 
 

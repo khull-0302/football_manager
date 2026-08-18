@@ -67,3 +67,42 @@ def get_all_users(auth_info):
 
 
 
+@authenticate_return_auth
+def update_user_by_id(user_id, auth_info):
+    if auth_info.user.role != 'super-admin':
+                return jsonify({"message": "unauthorized"}), 401
+    
+    post_data = request.form if request.form else request.json
+
+    user_query = db.session.query(Users).filter(Users.user_id == user_id).first()
+
+    if user_query:
+        populate_object(user_query, post_data)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return jsonify({"message": "unable to update user"}), 400
+        
+        return jsonify({"message": "user updated", "result": user_schema.dump(user_query)}), 200
+    
+    return jsonify({"message": "unable to update user"}), 400
+
+
+@authenticate_return_auth
+def delete_user_by_id(user_id, auth_info):
+    if auth_info.user.role != 'super-admin': 
+            return jsonify({"message": "unauthorized"}), 401
+    
+    user_query = db.session.query(Users).filter(Users.user_id == user_id).first()
+
+    if not user_query:
+        return jsonify({"message": "user not found"}), 404
+
+    db.session.delete(user_query)
+    db.session.commit()
+
+    return jsonify({
+        "message": "user deleted"
+    }), 200

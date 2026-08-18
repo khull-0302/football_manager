@@ -13,7 +13,7 @@ class Divisions(db.Model):
     division_name = db.Column(db.String(), nullable=False)
     conference = db.Column(db.String(), nullable=False)
 
-    teams = db.relationship("Teams", back_populates="division")
+    teams = db.relationship("Teams", back_populates="division", cascade="all, delete-orphan")
 
     def __init__(self, division_name, conference):
         self.division_name = division_name

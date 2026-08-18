@@ -31,3 +31,44 @@ def get_all_divisions():
     divisions_query = db.session.query(Divisions).all()
 
     return jsonify({"message": "divisions found", "results": divisions_schema.dump(divisions_query)}), 200
+
+
+@authenticate_return_auth
+def update_division_by_id(division_id, auth_info):
+    if auth_info.user.role != 'super-admin':
+                return jsonify({"message": "unauthorized"}), 401
+    
+    post_data = request.form if request.form else request.json
+
+    division_query = db.session.query(Divisions).filter(Divisions.division_id == division_id).first()
+
+    if division_query:
+        populate_object(division_query, post_data)
+
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            return jsonify({"message": "unable to update division"}), 400
+        
+        return jsonify({"message": "division updated", "result": division_schema.dump(division_query)}), 200
+    
+    return jsonify({"message": "unable to update division"}), 400
+
+
+@authenticate_return_auth
+def delete_division_by_id(division_id, auth_info):
+    if auth_info.user.role != 'super-admin': 
+            return jsonify({"message": "unauthorized"}), 401
+    
+    division_query = db.session.query(Divisions).filter(Divisions.division_id == division_id).first()
+
+    if not division_query:
+        return jsonify({"message": "division not found"}), 404
+
+    db.session.delete(division_query)
+    db.session.commit()
+
+    return jsonify({
+        "message": "division deleted"
+    }), 200
