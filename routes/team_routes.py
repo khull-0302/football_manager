@@ -12,6 +12,10 @@ def add_team():
 def get_all_teams():
     return controllers.get_all_teams()
 
+@team.route('/team/<team_id>', methods=['GET'])
+def get_team_by_id(team_id):
+    return controllers.get_team_by_id(team_id)
+
 @team.route('/team/<team_id>', methods=['PUT'])
 def update_team_by_id(team_id):
     return controllers.update_team_by_id(team_id)

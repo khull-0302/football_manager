@@ -43,6 +43,16 @@ def get_all_coaches():
     
     return jsonify({"message": "coaches found", "results": coaches_schema.dump(coaches_query)}), 200
 
+@authenticate
+def get_coach_by_id(coach_id):
+    
+    coach_query = db.session.query(Coaches).filter(Coaches.coach_id == coach_id).first()
+
+    return jsonify ({
+        "message": "coach found",
+        "results": coach_schema.dump(coach_query)
+    }),200
+
 
 @authenticate_return_auth
 def update_coach_by_id(coach_id, auth_info):

@@ -33,6 +33,17 @@ def get_all_divisions():
     return jsonify({"message": "divisions found", "results": divisions_schema.dump(divisions_query)}), 200
 
 
+@authenticate
+def get_division_by_id(division_id):
+    
+    division_query = db.session.query(Divisions).filter(Divisions.division_id == division_id).first()
+
+    return jsonify ({
+        "message": "division found",
+        "results": division_schema.dump(division_query)
+    }),200
+
+
 @authenticate_return_auth
 def update_division_by_id(division_id, auth_info):
     if auth_info.user.role != 'super-admin':

@@ -12,6 +12,10 @@ def add_stadium():
 def get_all_stadiums():
     return controllers.get_all_stadiums()
 
+@stadium.route('/stadium/<stadium_id>', methods=['GET'])
+def get_stadium_by_id(stadium_id):
+    return controllers.get_stadium_by_id(stadium_id)
+
 @stadium.route('/stadium/<stadium_id>', methods=['PUT'])
 def update_stadium_by_id(stadium_id):
     return controllers.update_stadium_by_id(stadium_id)

@@ -35,6 +35,17 @@ def get_all_teams():
     return jsonify({"message": "teams found", "results": teams_schema.dump(teams_query)}), 200
 
 
+@authenticate
+def get_team_by_id(team_id):
+    
+    team_query = db.session.query(Teams).filter(Teams.team_id == team_id).first()
+
+    return jsonify ({
+        "message": "team found",
+        "results": team_schema.dump(team_query)
+    }),200
+
+
 @authenticate_return_auth
 def update_team_by_id(team_id, auth_info):
     if auth_info.user.role != 'super-admin':

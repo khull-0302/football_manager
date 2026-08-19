@@ -12,6 +12,10 @@ def add_division():
 def get_all_divisions():
     return controllers.get_all_divisions()
 
+@division.route('/division/<division_id>', methods=['GET'])
+def get_division_by_id(division_id):
+    return controllers.get_division_by_id(division_id)
+
 @division.route('/division/<division_id>', methods=['PUT'])
 def update_division_by_id(division_id):
     return controllers.update_division_by_id(division_id)

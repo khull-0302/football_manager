@@ -44,6 +44,17 @@ def get_all_stadiums():
     return jsonify({"message": "stadiums found", "results": stadiums_schema.dump(stadiums_query)}), 200
 
 
+@authenticate
+def get_stadium_by_id(stadium_id):
+    
+    stadium_query = db.session.query(Stadiums).filter(Stadiums.stadium_id == stadium_id).first()
+
+    return jsonify ({
+        "message": "stadium found",
+        "results": stadium_schema.dump(stadium_query)
+    }),200
+
+
 
 @authenticate_return_auth
 def update_stadium_by_id(stadium_id, auth_info):

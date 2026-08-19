@@ -58,7 +58,7 @@ def get_all_players():
 @authenticate
 def get_players_by_team_id(team_id):
     
-    players_query = db.session.query(Players).filter(Players.team_id == team_id).all()
+    players_query = db.session.query(Players).filter(Players.team_id == team_id).first()
 
     return jsonify ({
         "message": "players found",
