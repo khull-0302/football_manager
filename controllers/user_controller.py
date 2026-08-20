@@ -28,11 +28,12 @@ def add_user():
 @authenticate_return_auth
 def add_user_player_association(auth_info):
     post_data = request.form if request.form else request.json
-    user_id = post_data.get('user_id')
+    user_id = auth_info.user.user_id
     player_id = post_data.get('player_id')
 
-    if auth_info.user.role != 'super-admin':
+    if auth_info.user.user_id != user_id:
             return jsonify({"message": "unauthorized"}), 401
+
 
     user_query = db.session.query(Users).filter(Users.user_id == user_id).first()
     player_query = db.session.query(Players).filter(Players.player_id == player_id).first()
